@@ -3,18 +3,18 @@ from datetime import datetime
 
 from fastapi import APIRouter
 from hydra.utils import instantiate
-from llm_chatbot_api.api.schemas import ModelConfig, QueryModelRequest, QueryModelResponse
-from llm_chatbot_api.core.llm import LLM
-from llm_chatbot_api.db import crud
-from llm_chatbot_api.utils.exceptions import ChatDoesNotExist, MessageIsEmpty, MessageIsTooLong, UserDoesNotExist
+from ai_tutor_api.api.schemas import ModelConfig, QueryModelRequest, QueryModelResponse
+from ai_tutor_api.core.llm import LLM
+from ai_tutor_api.db import crud
+from ai_tutor_api.utils.exceptions import ChatDoesNotExist, MessageIsEmpty, MessageIsTooLong, UserDoesNotExist
 from omegaconf import OmegaConf
 
 # Load logging configuration with OmegaConf
-logging_config = OmegaConf.to_container(OmegaConf.load("./src/llm_chatbot_api/conf/logging_config.yaml"), resolve=True)
+logging_config = OmegaConf.to_container(OmegaConf.load("./src/ai_tutor_api/conf/logging_config.yaml"), resolve=True)
 logging.config.dictConfig(logging_config)
 logger = logging.getLogger(__name__)
 
-config = OmegaConf.load("./src/llm_chatbot_api/conf/config.yaml")
+config = OmegaConf.load("./src/ai_tutor_api/conf/config.yaml")
 model_config = instantiate(config.llm.config.default)
 llm = LLM(model_config)
 

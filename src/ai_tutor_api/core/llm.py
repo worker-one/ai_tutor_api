@@ -1,7 +1,7 @@
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_fireworks import ChatFireworks
 from langchain_openai import ChatOpenAI
-from llm_chatbot_api.api.schemas import ModelConfig, ModelResponse
+from ai_tutor_api.api.schemas import ModelConfig, ModelResponse
 
 
 class LLM:

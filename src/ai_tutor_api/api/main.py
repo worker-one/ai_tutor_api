@@ -3,11 +3,11 @@ import uvicorn
 from fastapi import FastAPI
 from omegaconf import OmegaConf
 
-from llm_chatbot_api.api.routes import chats, llm, users
-from llm_chatbot_api.db.database import create_tables
+from ai_tutor_api.api.routes import chats, llm, users
+from ai_tutor_api.db.database import create_tables
 
 # Load logging configuration with OmegaConf
-logging_config = OmegaConf.to_container(OmegaConf.load("./src/llm_chatbot_api/conf/logging_config.yaml"), resolve=True)
+logging_config = OmegaConf.to_container(OmegaConf.load("./src/ai_tutor_api/conf/logging_config.yaml"), resolve=True)
 logging.config.dictConfig(logging_config)
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ def create_app(config_path: str) -> FastAPI:
 
 
 if __name__ == "__main__":
-    config_path = "src/llm_chatbot_api/conf/config.yaml"
+    config_path = "src/ai_tutor_api/conf/config.yaml"
     config = OmegaConf.load(config_path)
     create_tables()
     app = create_app(config_path)

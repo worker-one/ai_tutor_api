@@ -11,7 +11,7 @@ from .models import Base
 
 # Load logging configuration with OmegaConf
 logging_config = OmegaConf.to_container(
-    OmegaConf.load("./src/llm_chatbot_api/conf/logging_config.yaml"),
+    OmegaConf.load("./src/ai_tutor_api/conf/logging_config.yaml"),
     resolve=True
 )
 logging.config.dictConfig(logging_config)
@@ -37,7 +37,7 @@ DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NA
 def get_enginge():
     return create_engine(
         DATABASE_URL,
-        connect_args={'connect_timeout': 5, "application_name": "llm_chatbot_api"},
+        connect_args={'connect_timeout': 5, "application_name": "ai_tutor_api"},
         poolclass=NullPool
     )
 

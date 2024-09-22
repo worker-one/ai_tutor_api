@@ -1,13 +1,13 @@
 import logging
 from datetime import datetime
 from omegaconf import OmegaConf
-from llm_chatbot_api.db.database import get_session
-from llm_chatbot_api.db.models import Chat, Message, User
+from ai_tutor_api.db.database import get_session
+from ai_tutor_api.db.models import Chat, Message, User
 from sqlalchemy.orm import Session
 
 
 # Load logging configuration with OmegaConf
-logging_config = OmegaConf.to_container(OmegaConf.load("./src/llm_chatbot_api/conf/logging_config.yaml"), resolve=True)
+logging_config = OmegaConf.to_container(OmegaConf.load("./src/ai_tutor_api/conf/logging_config.yaml"), resolve=True)
 logging.config.dictConfig(logging_config)
 logger = logging.getLogger(__name__)
 

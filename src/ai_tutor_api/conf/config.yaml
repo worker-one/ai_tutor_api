@@ -1,7 +1,7 @@
 llm:
   config:
     default:
-      _target_: llm_chatbot_api.api.schemas.ModelConfig
+      _target_: ai_tutor_api.api.schemas.ModelConfig
       model_name: "accounts/fireworks/models/llama-v3-70b-instruct"
       chat_history_limit: 10
       max_tokens: 2500
