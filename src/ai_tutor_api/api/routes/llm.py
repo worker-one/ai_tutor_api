@@ -1,13 +1,15 @@
 import logging
 from datetime import datetime
 
-from fastapi import APIRouter
+from fastapi import APIRouter, File, UploadFile, Form
 from hydra.utils import instantiate
 from ai_tutor_api.api.schemas import ModelConfig, QueryModelRequest, QueryModelResponse
 from ai_tutor_api.core.llm import LLM
 from ai_tutor_api.db import crud
 from ai_tutor_api.utils.exceptions import ChatDoesNotExist, MessageIsEmpty, MessageIsTooLong, UserDoesNotExist
 from omegaconf import OmegaConf
+from PIL import Image
+import io
 
 # Load logging configuration with OmegaConf
 logging_config = OmegaConf.to_container(OmegaConf.load("./src/ai_tutor_api/conf/logging_config.yaml"), resolve=True)
@@ -39,12 +41,13 @@ def update_model_config(request: ModelConfig):
         return {"status": "error", "message": str(e)}
 
 @router.post("/model/query")
-def query(request: QueryModelRequest) -> QueryModelResponse:
-    user_id = request.user_id
-    chat_id = request.chat_id
-    user_message = request.user_message
-    config = request.config
-
+async def query(
+    user_id: str = Form(...),
+    chat_id: str = Form(...),
+    user_message: str = Form(None),
+    config: ModelConfig = Form(None),
+    file: UploadFile = File(None)  # Accept file uploads for images
+) -> QueryModelResponse:
     # check if user exists
     db_user = crud.read_user(user_id)
     if db_user is None:
@@ -55,23 +58,35 @@ def query(request: QueryModelRequest) -> QueryModelResponse:
     if db_chat is None:
         raise ChatDoesNotExist()
 
-    if not user_message:
+    if not user_message and file is None:
         raise MessageIsEmpty()
 
-    if len(user_message) > MAX_MESSAGE_LENGTH:
+    if user_message and len(user_message) > MAX_MESSAGE_LENGTH:
         raise MessageIsTooLong()
 
     logger.info(f"User {user_id} sent message: `{user_message}` in chat {chat_id}")
 
-    # add the message to the chat history
-    crud.create_message(chat_id, "user", content=user_message, timestamp=datetime.now())
+    # add the message to the chat history if it exists
+    if user_message:
+        crud.create_message(chat_id, "user", content=user_message, timestamp=datetime.now())
 
     # get the chat history
     chat_history = crud.get_chat_history(chat_id)
 
-    # invoke the model
+    # Process the image if uploaded
+    image = None
+    if file:
+        try:
+            image_bytes = await file.read()  # Read the file contents
+            image = Image.open(io.BytesIO(image_bytes))  # Convert to PIL Image
+            logger.info(f"Received image from user {user_id}")
+        except Exception as e:
+            logger.error(f"Error processing image: {e}")
+            raise e
+
+    # invoke the model with chat history and optionally with the image
     try:
-        response = llm.invoke(chat_history, config)
+        response = llm.invoke(chat_history, config, image=image)
         ai_message = response.response_content
     except Exception as e:
         logger.error(f"Error invoking model: {e}")
@@ -85,6 +100,7 @@ def query(request: QueryModelRequest) -> QueryModelResponse:
     except Exception as e:
         logger.error(f"Error adding AI message to chat history: {e}")
         raise e
+
     response = QueryModelResponse(
         user_id=user_id,
         chat_id=chat_id,
