@@ -23,7 +23,7 @@ RUN pip install --no-cache-dir .
 ENV PYTHONUNBUFFERED=1
 
 # Expose port (if needed, adjust according to your application needs)
-EXPOSE 8000
+EXPOSE 8080
 
 # Define the command to run the application
 CMD ["python", "src/llm_chatbot_api/api/main.py"]
