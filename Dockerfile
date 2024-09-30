@@ -1,6 +1,5 @@
 # Use the official Python image as the base image
 FROM python:3.10-slim
-MAINTAINER Konstantin Verner <konst.verner@gmail.com>
 
 # Set the working directory in the container
 WORKDIR /app
@@ -26,4 +25,4 @@ ENV PYTHONUNBUFFERED=1
 EXPOSE 8080
 
 # Define the command to run the application
-CMD ["python", "src/llm_chatbot_api/api/main.py"]
+CMD ["python", "src/ai_tutor_api/api/main.py"]
